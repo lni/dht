@@ -19,6 +19,7 @@ import (
 
 const (
 	maxPacketSize int = 4096
+	readTimeout       = 250 * time.Millisecond
 )
 
 type conn struct {
@@ -62,7 +63,7 @@ func (c *conn) ReceiveMessageLoop(stopc chan struct{}) error {
 		default:
 		}
 
-		timeout := time.Now().Add(10 * time.Millisecond)
+		timeout := time.Now().Add(readTimeout)
 		if err := c.c.SetReadDeadline(timeout); err != nil {
 			return err
 		}
