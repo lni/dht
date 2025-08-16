@@ -15,9 +15,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/lni/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.uber.org/zap"
 )
 
 func getTestDHTNetwork(t *testing.T) (*DHT, *DHT, func()) {
@@ -37,7 +37,7 @@ func getTestDHTNetwork(t *testing.T) (*DHT, *DHT, func()) {
 		},
 	}
 
-	logger := zap.Must(zap.NewProduction())
+	logger := log.MustGetTestLogger()
 
 	dht1, err := NewDHT(cfg1, logger)
 	require.NoError(t, err)
@@ -48,8 +48,8 @@ func getTestDHTNetwork(t *testing.T) (*DHT, *DHT, func()) {
 	require.NoError(t, dht2.Start())
 
 	cleanup := func() {
-		dht1.Close()
-		dht2.Close()
+		assert.NoError(t, dht1.Close())
+		assert.NoError(t, dht2.Close())
 	}
 
 	return dht1, dht2, cleanup
@@ -89,7 +89,7 @@ func TestDHTPutTTL(t *testing.T) {
 }
 
 func TestDHTSecret(t *testing.T) {
-	logger := zap.Must(zap.NewProduction())
+	logger := log.MustGetTestLogger()
 	cfg := Config{
 		Secret: 1,
 		Proto:  "udp4",
@@ -101,7 +101,9 @@ func TestDHTSecret(t *testing.T) {
 	router, err := NewDHT(cfg, logger)
 	require.NoError(t, err)
 	require.NoError(t, router.Start())
-	defer router.Close()
+	defer func() {
+		assert.NoError(t, router.Close())
+	}()
 
 	network := make([]*DHT, 0)
 	for i := 0; i < 32; i++ {
@@ -147,7 +149,7 @@ func TestDHTSecret(t *testing.T) {
 }
 
 func TestSmallDHTNetwork(t *testing.T) {
-	logger := zap.Must(zap.NewProduction())
+	logger := log.MustGetTestLogger()
 	cfg := Config{
 		Proto: "udp4",
 		Address: net.UDPAddr{
@@ -158,7 +160,9 @@ func TestSmallDHTNetwork(t *testing.T) {
 	router, err := NewDHT(cfg, logger)
 	require.NoError(t, err)
 	require.NoError(t, router.Start())
-	defer router.Close()
+	defer func() {
+		assert.NoError(t, router.Close())
+	}()
 
 	network := make([]*DHT, 0)
 	for i := 0; i < 32; i++ {
@@ -203,8 +207,7 @@ func TestSmallDHTNetwork(t *testing.T) {
 }
 
 func TestSmallDHTNetworkWithFailedNodes(t *testing.T) {
-	logger := zap.Must(zap.NewProduction())
-
+	logger := log.MustGetTestLogger()
 	cfg := Config{
 		Proto: "udp4",
 		Address: net.UDPAddr{
@@ -215,7 +218,9 @@ func TestSmallDHTNetworkWithFailedNodes(t *testing.T) {
 	router, err := NewDHT(cfg, logger)
 	require.NoError(t, err)
 	require.NoError(t, router.Start())
-	defer router.Close()
+	defer func() {
+		assert.NoError(t, router.Close())
+	}()
 
 	network := make([]*DHT, 0)
 	for i := 0; i < 32; i++ {

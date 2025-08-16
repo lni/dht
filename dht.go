@@ -15,7 +15,7 @@ import (
 	"time"
 
 	"github.com/lni/goutils/syncutil"
-	"go.uber.org/zap"
+	"github.com/lni/log"
 )
 
 const (
@@ -101,11 +101,11 @@ type DHT struct {
 	lastRefill time.Time
 
 	stopper *syncutil.Stopper
-	log     *zap.Logger
+	log     log.Logger
 }
 
 // NewDHT creates a DHT peer ready to be started.
-func NewDHT(cfg Config, logger *zap.Logger) (*DHT, error) {
+func NewDHT(cfg Config, logger log.Logger) (*DHT, error) {
 	nodeID := getRandomNodeID()
 	conn, err := newConn(cfg)
 	if err != nil {
@@ -297,15 +297,16 @@ func (d *DHT) request(r request) {
 }
 
 func (d *DHT) handleRequest(req request) {
-	if req.RequestType == RequestJoin {
+	switch req.RequestType {
+	case RequestJoin:
 		d.join()
-	} else if req.RequestType == RequestPut {
+	case RequestPut:
 		d.put(req.Target, req.Value, req.TTL)
-	} else if req.RequestType == RequestGet {
+	case RequestGet:
 		d.get(req.Target)
-	} else if req.RequestType == RequestGetFromCached {
+	case RequestGetFromCached:
 		d.getFromCached(req.Target, req.FromCachedCh)
-	} else {
+	default:
 		panic("unknown request type")
 	}
 }
@@ -475,17 +476,18 @@ func (d *DHT) sendMessage(m message, addr net.UDPAddr) {
 //
 
 func (d *DHT) handleQuery(msg message) {
-	if msg.RPCType == RPCPing {
+	switch msg.RPCType {
+	case RPCPing:
 		d.handlePingQuery(msg)
-	} else if msg.RPCType == RPCJoin {
+	case RPCJoin:
 		d.handleJoinQuery(msg)
-	} else if msg.RPCType == RPCFindNode {
+	case RPCFindNode:
 		d.handleFindNodeQuery(msg)
-	} else if msg.RPCType == RPCPut {
+	case RPCPut:
 		d.handlePutQuery(msg)
-	} else if msg.RPCType == RPCGet {
+	case RPCGet:
 		d.handleGetQuery(msg)
-	} else {
+	default:
 		panic("unknown type")
 	}
 }
@@ -583,15 +585,16 @@ func (d *DHT) handleResponse(msg message) {
 		return
 	}
 
-	if msg.RPCType == RPCPing {
+	switch msg.RPCType {
+	case RPCPing:
 		// nothing to do
-	} else if msg.RPCType == RPCGet {
+	case RPCGet:
 		d.handleGetResponse(msg)
-	} else if msg.RPCType == RPCFindNode {
+	case RPCFindNode:
 		d.handleFindNodeResponse(msg)
-	} else if msg.RPCType == RPCJoin {
+	case RPCJoin:
 		d.handleJoinResponse(msg)
-	} else {
+	default:
 		panic("unknown type")
 	}
 }

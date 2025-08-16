@@ -178,7 +178,8 @@ func (q *queryManager) IsExpectedResponse(msg message) bool {
 		panic("not a response")
 	}
 
-	if msg.RPCType == RPCPing {
+	switch msg.RPCType {
+	case RPCPing:
 		if p, ok := q.ping[msg.RPCID]; !ok {
 			return false
 		} else {
@@ -187,10 +188,10 @@ func (q *queryManager) IsExpectedResponse(msg message) bool {
 			}
 		}
 		return true
-	} else if msg.RPCType == RPCJoin {
+	case RPCJoin:
 		_, ok := q.join[msg.RPCID]
 		return ok
-	} else if msg.RPCType == RPCFindNode {
+	case RPCFindNode:
 		if f, ok := q.findNode[msg.RPCID]; !ok {
 			return false
 		} else {
@@ -199,12 +200,12 @@ func (q *queryManager) IsExpectedResponse(msg message) bool {
 			}
 		}
 		return true
-	} else if msg.RPCType == RPCGet {
+	case RPCGet:
 		_, ok := q.get[msg.RPCID]
 		return ok
+	default:
+		return false
 	}
-
-	return false
 }
 
 func (q *queryManager) GC() {
