@@ -18,7 +18,9 @@ See struct DHT's godoc for details, tests in dht\_test.go demonstrate how to use
 
 ## The Experiment
 
-This library is a little bit special in the sense that other than the selected LLM (OpenAI [GPT-4o](https://en.wikipedia.org/wiki/GPT-4o)) no other reference (paper, search engine, online discussion forum or blog articles etc.) is ever consulted during the development. This experiment helped to understand how much a SOTA LLM can assist during development. My overall experience strongly indicates that SOTA LLMs like OpenAI GPT-4o is already capable of correctly presenting and explaining the full details of a public and complex network protocol like Kadelmia for the purposes of implementing the concerned protocol.
+This library is a little bit special in the sense that other than the selected LLM (OpenAI [GPT-4o](https://en.wikipedia.org/wiki/GPT-4o)) no other references (the original paper, search engine, online discussion forum or blog articles etc.) is ever consulted during the development in mid 2024. This experiment helped to understand how much a SOTA LLM can assist during software development by just answering questions. My overall experience strongly indicates that SOTA LLMs like OpenAI GPT-4o is already capable of correctly presenting and explaining the full details of a public and complex network protocol like Kadelmia for the purposes of implementing the concerned protocol.
+
+The development of this project didn't involve any vibe coding tools. 
 
 ## License
 
